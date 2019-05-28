@@ -80,7 +80,7 @@ tags:
   * 同样也是基于`Randomized divide&conquer`, 很大程度上是类似于快排的做法。
   * 假设我们寻找的是第`i`小的数。按照快排中的步骤，将数组`A[]`的一部分排序成：A[p], ..., A[r], ..., A[q]。
   * 其中第一个省略号是小于等于`A[r]`的元素，第二个省略号是大于`A[r]`的元素。我们称`A[r]`为`partition element`, 并令`index of A[r]`为`k`，接下来我们讨论三种情况（其中`Rand-Select(A, p, q, i)`就是找到`A`中p-q范围内第`i`小的数，步骤就是我们正在叙述的内容）：
-    ```c
+    ```
     if i == k then return A[r]
     if i < k then return Rand-Select(A, p, r-1, i)
     else return Rand-Select(A, r+1, q, i-k) 
