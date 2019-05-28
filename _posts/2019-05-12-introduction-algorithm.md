@@ -4,7 +4,8 @@ title:      "算法导论笔记（上）"
 subtitle:   "持续更新。。。"
 date:       2019-05-12
 author:     "JohnReese"
-header-img: "img/post-bg-js-version.jpg"
+header-img: "img/home-bg-o.jpg"
+mathjax: True
 tags:
     - Algorithm
 ---

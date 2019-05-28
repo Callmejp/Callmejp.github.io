@@ -27,7 +27,7 @@ tags:
 4. 无监督学习。
 
 ## 问题：一个过滤器的`feature map`可能会被图像中不同位置的部分所激活
-![img](img/2019-5-12/image1.PNG)
+![img](/img/2019-5-12/image1.PNG)
 
 论文中的假设是如果一些`peaks`是由图像的相同部分造成的就称这些`peaks`为`part patterns`。否则，可能只是背景噪声所造成的。所以目标就是区分造成`peaks`的原因。所以说通过这种概念来建立起层级之间的联系。具体可以看这段话：
 
@@ -54,7 +54,7 @@ tags:
    > In this study, we propose a simple yet effective method to automatically discover object parts from a ﬁlter’s feature maps without ground-truth part annotations.
    * 我还看到作者假设EG两层之间的nodes, $V$ and $V'$ follows a Gaussian distribution in Eqn.4, 其中最终的推导式如下：
 
-   ![img](img/2019-5-12/image2.PNG)
+   ![img](/img/2019-5-12/image2.PNG)
    * 细节部分我还是能力有限，所以就不介绍了。有兴趣的还是看原文比较好。
 
 ## 实验
@@ -64,7 +64,7 @@ tags:
 1. pattern visualization: 分为3个小点
    * Top-ranked patches: 这个就是截取图像中具有`highest inference scores`的$70px\cdot70px$的图像块进行展示。 
 
-   ![img](img/2019-5-12/image3.PNG)
+   ![img](/img/2019-5-12/image3.PNG)
    * Heat maps of patterns: 顾名思义，热力图。就是一张灰度图，像素值大小与激活值大小成正比。
    * Pattern-based image synthesis: 整体的流程应该是保留得分最高的10%的`pattern`。再将这些`pattern`还原成图像和原图进行比较，发现CNN识别基本上都忽略了背景，主要关注的都是前景物体部分。
 2. semantic interpretability of patterns: 
@@ -73,9 +73,9 @@ tags:
      *  For the pattern of a given node V , we used people to `manually` evaluate the pattern’s interpretability.
      * We back-propagated the center of the receptive ﬁeld of each neural activation to the image plane and `simply used a ﬁxed radius` to draw the image region corresponding to each neural activation. Fig.8 compares the image region corresponding to each node in the explanatory graph and image regions corresponding to feature maps of each ﬁlter.
 
-     ![img](img/2019-5-12/image4.PNG)
+     ![img](/img/2019-5-12/image4.PNG)
    * Location instability of inference positions: 作者想验证是否一个`pattern`会被不同图像的相同部分所激活。如果是这样的话，the distance between the pattern’s inference position and a ground-truth landmark of the object part should not change a lot among various images. 
-   ![img](img/2019-5-12/image5.PNG)
+   ![img](/img/2019-5-12/image5.PNG)
    * 作者通过计算Fig.9中红点和蓝点间的距离来确定不稳定性。
 3. multi-shot part localization: 主要是验证EG对于不同CNN的可转移性，看的也不是很明白。
 
