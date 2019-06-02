@@ -18,8 +18,10 @@ tags:
 
 作者简单地介绍了近几年的抵御对抗训练的方法被`纷纷打脸`。
 >  Somewhat memorably, many of the adversarial defense papers at the most recent ICLR conference were broken prior to the review period completing (Athalye et al., 2018)
+
 这句话的翻译如下：
 > 令人印象深刻的是，最近ICLR会议上的许多对抗防御论文在审查期结束之前就被破坏了。
+
 那么作者就引出了自己的贡献，我也觉得很厉害，所以专门写个Blog详细记录下：
 1. a method for training `provably` robust deep ReLU classifiers, classifiers that are guaranteed
 to be robust against `any` norm-bounded adversarial perturbations on the `training set`.
@@ -29,9 +31,11 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
 ## Training Provably Robust Classifiers
 1. A $k$ layer feedforward ReLU-based neural network, $f_{\theta}: \mathbb{R} ^ {|x|} \rightarrow \mathbb{R} ^ {|y|} $ given by the equations:
     $$
-    \hat{z}_{i+1} = W_{i}z_{i} + b_{i}, for i = i,...,k-1
-    z_{i} = max{\hat{z}_{i}, 0}
-    with z_{1} \equiv x and f_{\theta}(x) \equiv \hat{z}_{k}
-    We use \theta = \{W_{i}, b_{i}\}_{i=1,...,k} to denote the set of all parameters of the network
+    \hat{z}_{i+1} = W_{i}z_{i} + b_{i}, for i = 1,...,k-1 \\
+    z_{i} = max(\hat{z}_{i}, 0) \\
+    其中z_{1} \equiv x and f_{\theta}(x) \equiv \hat{z}_{k} \\
+    我们使用\theta = \{W_{i}, b_{i}\}_{i=1,...,k}来表示网络中的所有参数
     $$
+    这一段是基本的关于DNN的描述。
+2. 我们使用集合$Z_{\$
 
