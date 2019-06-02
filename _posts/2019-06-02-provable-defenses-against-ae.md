@@ -41,8 +41,7 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
 2. 我们使用集合
     $$ Z_{\epsilon}(x) = \{f_{\theta}(x + \Delta):{||\Delta||}_{\infty} \leq \epsilon \} $$
 
-来表示对抗多边形(`adversarial polytope`)的点的集合,即图1中间那个坐标轴的图形，是非凸的。而他们方法的基础是使用外凸边界(`convex outer bound`)来包裹对抗多边形。那么只要能保证外凸边界中的点都改变不了最终DNN的输出就能够保证原来的对抗多边形的点也是如此，那么鲁棒性就得到了满足。这是比较好理解的。
-
+    来表示对抗多边形(`adversarial polytope`)的点的集合,即图1中间那个坐标轴的图形，是非凸的。而他们方法的基础是使用外凸边界(`convex outer bound`)来包裹对抗多边形。那么只要能保证外凸边界中的点都改变不了最终DNN的输出就能够保证原来的对抗多边形的点也是如此，那么鲁棒性就得到了满足。这是比较好理解的。
     ![img](/img/2019-6-2/image1.JPG)
 
 3. 构造外凸边界的第一步是对于ReLU函数的线性表示。
