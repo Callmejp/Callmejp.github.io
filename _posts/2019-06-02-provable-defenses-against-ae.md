@@ -16,7 +16,7 @@ tags:
 
 ## Introduction
 
-作者简单地介绍了近几年的抵御对抗训练的方法被`纷纷打脸`。
+作者简单地介绍了近几年的抵御对抗攻击的训练的方法被`纷纷打脸`。
 >  Somewhat memorably, many of the adversarial defense papers at the most recent ICLR conference were broken prior to the review period completing (Athalye et al., 2018)
 
 这句话的翻译如下：
@@ -33,16 +33,34 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
     $$
     \hat{z}_{i+1} = W_{i}z_{i} + b_{i}, for\ i = 1,...,k-1 \\
     z_{i} = max(\hat{z}_{i}, 0) \\
-    其中z_{1} \equiv x\  且\ f_{\theta}(x) \equiv \hat{z}_{k} \\
+    其中\ z_{1} \equiv x\  且\ f_{\theta}(x) \equiv \hat{z}_{k} \\
     使用\theta = \{W_{i}, b_{i}\}_{i=1,...,k}来表示网络中的所有参数
     $$
 
     这一段是基本的关于DNN的描述。
-2. 我们使用集合
-    $$ Z_{\epsilon}(x) = \{f_{\theta}(x + \Delta):{||\Delta||}_{\infty} \leq \epsilon \} $$
+2. 他们使用集合
+    $$
+    Z_{\epsilon}(x) = \{f_{\theta}(x + \Delta):{||\Delta||}_{\infty} \leq \epsilon \}
+    $$
 
     来表示对抗多边形(`adversarial polytope`)的点的集合,即图1中间那个坐标轴的图形，是非凸的。而他们方法的基础是使用外凸边界(`convex outer bound`)来包裹对抗多边形。那么只要能保证外凸边界中的点都改变不了最终DNN的输出就能够保证原来的对抗多边形的点也是如此，那么鲁棒性就得到了满足。这是比较好理解的。
     ![img](/img/2019-6-2/image1.JPG)
 
 3. 构造外凸边界的第一步是对于ReLU函数的线性表示。
     ![img](/img/2019-6-2/image2.JPG)
+
+    如图2所示，我们可以用
+    $$
+    z \geq 0, z \geq \hat{z}, -u\hat{z} + (u - l) \leq -ul.
+    $$
+
+    来代替$z = max(0, \hat{z})$。其中如果$l,u$都为正数或负数，那么缩放（`relaxation`）是确定的。
+
+4. 那么构造外凸边界有什么用呢？作者想找到其中最`坏`的点。也就是给定已知$y^{*}$标签的样本$x$，找到Z_{\epsilon}(x)其中最小化正确标签输出值且最大化其它标签$y^{tag}$的输出值。这可以通过解决如下的优化问题来解决：
+    $$
+    \under{minimize}_{\hat{z}_{k}} {\hat{z}_{k}}_{y^{*}} - {\hat{z}_{k}}_{y^{tag}} \equiv c^{T} \hat{z}_{k} \\
+    subject\ to\ \hat{z}_{k} \in \tilde{Z}_{\epsilon}(x) \\
+    where\ c \equiv e_{y^{*}} - e_{y^{tag}}
+    $$
+
+    这是一个线性规划问题。
