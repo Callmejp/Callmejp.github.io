@@ -54,7 +54,7 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
 4. 那么构造外凸边界有什么用呢？作者想找到其中最`坏`的点。也就是给定已知$y^{*}$标签的样本$x$，找到$Z_{\epsilon}(x)$其中最小化正确标签输出值且最大化其它标签$y^{tag}$的输出值。这可以通过解决如下的优化问题来解决：
 
     $$
-    \stacrel{minimize}{\hat{z}_{k}} {(\hat{z}_{k})}_{y^{*}} - {(\hat{z}_{k})}_{y^{tag}} \equiv c^{T} \hat{z}_{k} \\
+    \underbrace{minimize}_{\hat{z}_{k}} {(\hat{z}_{k})}_{y^{*}} - {(\hat{z}_{k})}_{y^{tag}} \equiv c^{T} \hat{z}_{k} \\
     subject\ to\ \hat{z}_{k} \in \tilde{Z}_{\epsilon}(x) \\
     where\ c \equiv e_{y^{*}} - e_{y^{tag}}
     $$
@@ -63,4 +63,10 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
 
     > If we solve this LP for all target classes $y^{tag} \neq y^{*}$ and find that the objective value in all cases is positive (i.e., we cannot make the true class activation lower than the target even in the outer polytope), then we know that no norm-bounded adversarial perturbation of the input could misclassify the example.
 
-    作者认为对于测试集也能进行上述的步骤，只是将正确的标签换成其预测的标签。
+    作者认为对于测试集也能进行上述的步骤，只是将正确的标签换成了其预测的标签。但这可能会导致非对抗样本被判断成对抗样本，不过这样可以保证所有的对抗样本都被识别了出来。大致的过程讲完以后，作者认为有两个比较严峻的问题：其一是上述的目标线性规划问题通过传统的地方不是很好处理，因为要处理输出层的所有神经元的个数`次`；其二是ReLU边界缩放的问题。`看到这里我突然发现这好像没谈处理CNN啊。。。`
+
+## Efficient Optimization via the Dual Network
+1. 作者认为为了解决第一个问题，我们应该拿出对偶问题。为什么呢？
+    >  any feasible dual solution provides a guaranteed lower bound on the solution of the primal.
+
+    翻译一下就是任何对偶解法都提供了对原问题有保障的下界。特别重要的是，作者说对偶问题的可行集合可以被表达为一个深度网络，一个和标准BP网络非常像的网络。这就意味着相关的证明可以通过对原网络进行改动后的一次反向传播实现。
