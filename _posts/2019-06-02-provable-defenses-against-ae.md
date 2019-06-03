@@ -49,18 +49,18 @@ to be robust against `any` norm-bounded adversarial perturbations on the `traini
 3. 构造外凸边界的第一步是对于ReLU函数的线性表示。
     ![img](/img/2019-6-2/image2.JPG)
 
-    如图2所示，我们可以用
-    $$
-    z \geq 0, z \geq \hat{z}, -u\hat{z} + (u - l) \leq -ul.
-    $$
+    如图2所示，我们可以用$z \geq 0, z \geq \hat{z}, -u\hat{z} + (u - l)z \leq -ul.$来代替$z = max(0, \hat{z})$。其中如果$l,u$都为正数或负数，那么缩放（`relaxation`）是确定的。
 
-    来代替$z = max(0, \hat{z})$。其中如果$l,u$都为正数或负数，那么缩放（`relaxation`）是确定的。
+4. 那么构造外凸边界有什么用呢？作者想找到其中最`坏`的点。也就是给定已知$y^{*}$标签的样本$x$，找到$Z_{\epsilon}(x)$其中最小化正确标签输出值且最大化其它标签$y^{tag}$的输出值。这可以通过解决如下的优化问题来解决：
 
-4. 那么构造外凸边界有什么用呢？作者想找到其中最`坏`的点。也就是给定已知$y^{*}$标签的样本$x$，找到Z_{\epsilon}(x)其中最小化正确标签输出值且最大化其它标签$y^{tag}$的输出值。这可以通过解决如下的优化问题来解决：
     $$
-    \under{minimize}_{\hat{z}_{k}} {\hat{z}_{k}}_{y^{*}} - {\hat{z}_{k}}_{y^{tag}} \equiv c^{T} \hat{z}_{k} \\
+    \stacrel{minimize}{\hat{z}_{k}} {(\hat{z}_{k})}_{y^{*}} - {(\hat{z}_{k})}_{y^{tag}} \equiv c^{T} \hat{z}_{k} \\
     subject\ to\ \hat{z}_{k} \in \tilde{Z}_{\epsilon}(x) \\
     where\ c \equiv e_{y^{*}} - e_{y^{tag}}
     $$
 
-    这是一个线性规划问题。
+    其中的$e_{y^{*}}$我觉得可以看成是一个`One-Hot`向量。作者说因为目标函数是线性的，故这是一个线性规划问题。所以
+
+    > If we solve this LP for all target classes $y^{tag} \neq y^{*}$ and find that the objective value in all cases is positive (i.e., we cannot make the true class activation lower than the target even in the outer polytope), then we know that no norm-bounded adversarial perturbation of the input could misclassify the example.
+
+    作者认为对于测试集也能进行上述的步骤，只是将正确的标签换成其预测的标签。
