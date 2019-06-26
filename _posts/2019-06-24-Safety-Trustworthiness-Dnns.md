@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "对于训练数据可验证的鲁棒性的训练方法"
+title:      "关于DNN可信方面的综述"
 subtitle:   "论文解读"
 date:       2019-06-24
 author:     "JohnReese"
@@ -16,12 +16,12 @@ tags:
 主要内容是关于DNN的可信化，即包括验证（`certification`）与解释（`explanation`）两个方面。原文的作者给出了如下的观点。
 
 $$
-Trustworthiness \equal Certification \add Explanation
+Trustworthiness = Certification + Explanation
 $$
 
 ## Certification
 验证主要是针对DNN中出现的[对抗样本](https://arxiv.org/abs/1312.6199)的情况。目前的验证主要包括证明（`verification`）和测试（`testing`）。
-其中`证明`一般是针对某个给定的输入$X$来验证某个鲁棒属性是否能满足。然后证明又分为准确的和有误差的，但是基本上都受制于问题的规模，毕竟在[这篇文章](https://arxiv.org/abs/1804.09699)里（原文如下），作者提到证明计算最近扰动距离是一个NP问题。
+其中`证明`一般是针对某个给定的输入$X$来验证某个鲁棒属性是否能满足。然后证明又分为准确的和有误差的，但是基本上都受制于问题的规模，毕竟在[这篇文章](https://arxiv.org/abs/1804.09699)里（原文如下），作者证明了计算最近扰动距离是一个NP问题。
 
 > In addition, we show that there is no polynomial time algorithm that can approximately find the minimum $l_{1}$ adversarial distortion of a ReLU network with a $0.99\log_e n$ approximation ratio unless $NP=P$, where $n$ is the number of neurons in the network.
 
@@ -31,26 +31,26 @@ $$
 可解释性，顾名思义，就是DNN的开发与设计人员是否知道DNN对于某个输入为什么会输出这样的结果。特别是包含DNN的软件，在交付之时就无法对用户进行说明。
 
 ## Verification
-作者将所列举的论文根据其底层所使用的方法大致分为图6：
+作者将所列举的论文根据其底层所使用的方法大致分为图6所示的样子：
 
 ![img](/img/2019-6-24/image1.JPG)
 
 同时也可以依据他们方法所具有的保证来进行分类，详细如下：
 
-### Approaches with Deterministic Guarantees
+#### 1.Approaches with Deterministic Guarantees
 精确的保证。
-1. SMT/SAT: 通过将一个DNN抽象成一组线性算术约束的布尔组合。且无论何时抽象模型声明为安全，那么对于具体的模型也是如此。
+1. SMT/SAT: 通过将一个DNN抽象成一组线性算术约束的布尔组合。且无论何时抽象的模型表明是安全的，那么对于原来的模型也是如此。
 2. MILP: 混合整数线性规划。如果都是基于MILP，那么方法的不同性一般在于建模的过程或是如何与其它方式相结合。因为底层的实现大多会采用成熟的求解器。
 
-### Approaches to Compute a Lower Bound
+#### 2.Approaches to Compute a Lower Bound
 提供接近最小扰动值的下界。
-1. Abstract Interpretation: 抽象解释。将问题转换到自行建模的抽象域中求解，并且在抽象域中所能满足的性质原问题也一定能满足。
-2. Convex Optimisation: 凸优化。这里有一篇想法非常新颖的论文，其详细内容可以在[这里](https://callmejp.github.io/2019/06/02/provable-defenses-against-ae/)看到。其特点类似于作者提到的证明大方向，但大多数的证明是证明训练好的DNN具有鲁棒性，而这篇论文证明的是训练方法所能带来的鲁棒性。
-3. Interval Analysis: 区间分析。放宽每一层的激活函数值的边界来进行递推，和使用`Interval`抽象域的方法，比如，[Gehr et al., 2018](https://www.cs.rice.edu/~sc40/pubs/ai2.pdf)有相似之处。
-4. Output Reachable Set Estimation: 
+1. Abstract Interpretation: 抽象解释。将问题转换到自行建模的抽象域中求解，并且在抽象域中所能满足的属性原问题也一定能满足。
+2. Convex Optimisation: 凸优化。这里有一篇想法非常新颖的论文，其详细内容可以在[这里](https://callmejp.github.io/2019/06/02/provable-defenses-against-ae/)看到。其特点类似于作者提到的`证明`这个大方向。大多数的证明是证明训练好的DNN具有鲁棒性，而这篇论文证明的是训练方法所能带来的鲁棒性。
+3. Interval Analysis: 区间分析。放宽每一层的激活函数值的边界来进行递推，和使用`Interval`抽象域的方法，比如[Gehr et al., 2018](https://www.cs.rice.edu/~sc40/pubs/ai2.pdf)，有相似之处。
+4. Output Reachable Set Estimation: 这里阅读了[Xiang et al., 2018](https://arxiv.org/pdf/1708.03322.pdf)这篇论文，其中的想法是计算输入中的一个单位的指定干扰对输出造成的最大波动$\delta$，即`maximum sensitivity`。那么对于给定的输入，枚举有限的在$\delta$扰动内的输入集合。对于每个输入集合，根据`maximum sensitivity`来计算输出的可能范围$\tilde{y}$，其因为`maximum sensitivity`的性质，精确的输出范围$y \subset \tilde{y}$。所以可以快速地得出$\tilde{y}$，并与`safety verification`（$S$）的区域进行比较。但是$S$的区域一般性的方法如何得到论文好像没有提及，好像有改进的余地。同样地，扩展范围的通病是在不满足安全性的时候无法确定真实的范围也是如此。
 5. Linear Approximation of ReLU Networks: 对于ReLU网络的线性近似。
 
-### Approaches with Converging Upper and Lower Bounds
+#### 3.Approaches with Converging Upper and Lower Bounds
 提供最小扰动值的上下界。这些方法相较于之前的方法能适应更加大型的网络。
 1. Reduction to A Two-Player Turn-based Game: 这也是比较有意思的一篇论文，将问题归结为类似于博弈的问题，并使用不同的搜索算法来分别接近其上下界。但是实验结果不是非常理想，因为其上界和下界往往差了一个数量级，比如上界接近5，而下界还在接近0.5。
 
