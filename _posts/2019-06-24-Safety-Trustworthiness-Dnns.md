@@ -28,7 +28,7 @@ $$
 而`测试`就像目前使用测试样例来保证常规软件的需求一样来使用大量或者特殊的`test cases`来测试神经网络找到其中的bug。优缺点都很明显，因为只是执行样例所以可以适应目前主流网络的规模，然而就像目前商业软件交付一样没有严格的形式化方式证明的话依旧有可能产生bug，且在DNN领域还没有样例的`覆盖性度量`指标。
 
 ## Explanation
-可解释性，顾名思义，就是DNN的开发与设计人员是否知道DNN对于某个输入为什么会输出这样的结果。特别是包含DNN的软件，在交付之时就无法对用户进行说明。
+可解释性，顾名思义，就是DNN的开发与设计人员是否知道DNN对于某个输入为什么会输出这样的结果。特别是包含DNN的软件，目前在交付之时就无法对用户进行说明。
 
 ## Verification
 作者将所列举的论文根据其底层所使用的方法大致分为图6所示的样子：
@@ -80,14 +80,17 @@ $$
 ## Adversarial Attack and Defence
 
 ### Attack
-对抗攻击这部分就不详细叙述了。我觉得找到没对抗样本只是一个必要条件。就和测试集对DNN进行测试一样，如果对抗攻击的方法可以被证明在找不到对抗样本的情况下就不存在对抗样本，这样的方法就是真正地上了一个台阶。
+对抗攻击这部分就不详细叙述了。我觉得没找到对抗样本只是一个必要条件。就和测试集对DNN进行测试一样，如果对抗攻击的方法可以被证明在找不到对抗样本的情况下就不存在对抗样本，这样的方法就是真正地上了一个台阶。
 
 ### Defence
 1. Adversarial Training: 对抗训练。将对抗样本添加进训练集并调整目标函数。
 2. Defensive Distillation: 蒸馏。主要的思想是来自Hinton的论文。就是设计相同的两个DNN。使用经过原始网络得到的标签来更新数据集（$X$还是原来的$X$，$Y$不是原来的$Y$），并以此来训练新的网络。
 3. Dimensionality Reduction: 维度缩减。比如将784维的MNIST样本缩减为20维的输入进行训练。
 4. Input Transformations: 转换输入。比如提前判断测试的样本是否是对抗样本或是对测试的样本进行一些操作，比如说缩放、裁剪等。这个照我的理解就是比方说有针对几个单独像素点进行改动的对抗样本，那么进行高斯滤波消除噪声，应该可以在不影响判断结果的前提下缓解这些突出像素点所造成的影响。
-5. Combining Input Discretisation with Adversarial Training: ...
+5. Combining Input Discretisation with Adversarial Training: `Google`的一篇论文，离散化输入样本。因为DNN在高维空间倾向于拟合线性函数。而使用更多的非线性激活函数确实可以提升鲁棒性但是可训练性会下降，所以泛化性不强。所以考虑对输入样本做不可微且非线性的离散化操作再将它输入给`DNN`进行训练。从表一看到目前一些非线性的转换方式。这里主要解释下从左边数的第三列。因为一般像素值进行归一化是在[0, 1]之间，所以简单化的操作是将区间分为10份。所以向量中每个0/1代表的是[0, 0.1]，[0.1, 0.2]。。。[0.9, 1]，其中只有1位被激活。然而作者认为这样子忽略了像素之间的联系，所以进行了简单的修改来获得更好的效果。
+
+![img2](/img/2019-6-24/image2.JPG)
+
 6. Activation Transformations: 针对`激活`的操作。在前馈操作时，随机去掉一些节点，保留节点的概率与其激活程度成正比。然后再扩展幸存的节点。
 7. Characterisation of Adversarial Region: 寻找对抗区域。即对抗样本聚集的区域。
 8. Defence against Data Poisoning Attack: 这个就比较少见了，攻击者能够对训练数据做手脚。
@@ -97,16 +100,16 @@ $$
 可解释性太抽象了，就大致讲讲几个大方向。
 1. 可视化的解释。
 2. 关于图片中存在特征的`Rank`。
-3. 和第二点差不多，就是绘制特征图（` Saliency Maps`）。
-4. 用影响函数（` Influence Functions`）理解`DNN`。
-5. 使用简化的模型来替代`DNN`。
+3. 和第二点差不多，就是绘制特征图（`Saliency Maps`）。
+4. 用影响函数（`Influence Functions`）理解`DNN`。这里有一篇类似翻译的[博客](http://nooverfit.com/wp/icml-2017%E8%AE%BA%E6%96%87%E7%B2%BE%E9%80%891-%E7%94%A8%E5%BD%B1%E5%93%8D%E5%87%BD%E6%95%B0%E7%90%86%E8%A7%A3%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E9%BB%91%E7%9B%92%E9%A2%84/)，可以看看。具体是指单个训练样本对所有模型参数的影响程度，以及对于测试样本的影响程度。
+5. 使用简化的模型来替代`DNN`。比如决策树，但我觉得这不太可行，因为特征是`DNN`自行习得的。
 6. 使用信息理论的信息流方法。
 
 ## Future Challenges
-未来的一些挑战。下面的点都是作者的总结的，我觉得这些相对有价值些。
+未来的一些挑战。下面的点都是作者的总结的，我觉得这些对于我来说相对更有价值些。
 1. 距离的度量不应该是基于范数，而是从人类观察的角度来衡量两张图片的相似性。
 2. 如何基于发现的对抗样本来实际地提高原网络的鲁棒性。
-3. 目前业界大部分的精力都放在了前馈神经网络上（`feedforward DNNs`），作者认为在深度强化学习模型（`deep reinforcement learning models`），循环神经网络(`recursive neural networks`),亦或如支持向量机等（`SVM`)其它机器学习算法。
+3. 目前业界大部分的精力都放在了前馈神经网络上（`feedforward DNNs`），作者认为在深度强化学习模型（`deep reinforcement learning models`），循环神经网络(`recursive neural networks`)，亦或如支持向量机（`SVM`)等其它机器学习算法。
 4. 作者说应该研究更加高级的语言来处理神经网络的不同属性，而不是使用特定的方法来单独处理一些属性。
 5. 第5点也是我一直“耿耿于怀”的，作者也希望出现能适应更加大规模且精确的检测方法（`Scalable Verification with Tighter Bounds`）。
 6. 测试方法的验证。目前很多测试的方法都像对待传统软件一样是基于覆盖率的，但作者认为显然单个神经元并不等价于传统程序中的一个变量，因为单个神经元可能并不能决定某个`input`的执行路径。因此，对于`DNNs`，需要更加复杂精巧的对于覆盖度的衡量。
@@ -119,7 +122,7 @@ $$
 > All the techniques reviewed are to improve the trust of human users on the DNNs through the angles of certification and explanation. Certification techniques improve the confidence of the users on the correctness of the DNNs, and the explanation techniques increase human users’ understanding about the DNNs and thus improve the trust. These can be seen as a one-way enhancement of confidence from the DNNs to the human users. The other direction, i.e., how human users can help improve the trustworthiness of the DNNs, is less explored. There are only a few works such as [Tamagnini et al., 2017], where a visual analytic interface is presented to enable expert user by interactively exploring a set of instance-level explanations.
 
 ## Conclusions
-作者认为这是集`formal verification`, `software testing`, `machine learning`和`logic reasoning`多个领域知识的崭新的研究方向。虽然我还算初学者，但我觉得还应该加上数学。
+作者认为这是集`formal verification`，`software testing`，`machine learning`和`logic reasoning`多个领域知识的崭新的研究方向。虽然我还算初学者，但我觉得还应该加上数学。
 并且我觉得如果不能做到实用的级别，那么再多的研究也只是五十步笑百步。所以我有点迷茫，这么多可以着力的小方向到底哪个才是“正途”呢？
 这里分享一个可有可无的观点，是我在github上“厚着脸”向这篇[论文](https://files.sri.inf.ethz.ch/website/papers/DeepPoly.pdf)的作者提的问题。
 
