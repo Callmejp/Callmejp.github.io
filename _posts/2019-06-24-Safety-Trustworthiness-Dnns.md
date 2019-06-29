@@ -104,5 +104,25 @@ $$
 
 ## Future Challenges
 未来的一些挑战。下面的点都是作者的总结的，我觉得这些相对有价值些。
-1. 
-2. 
+1. 距离的度量不应该是基于范数，而是从人类观察的角度来衡量两张图片的相似性。
+2. 如何基于发现的对抗样本来实际地提高原网络的鲁棒性。
+3. 目前业界大部分的精力都放在了前馈神经网络上（`feedforward DNNs`），作者认为在深度强化学习模型（`deep reinforcement learning models`），循环神经网络(`recursive neural networks`),亦或如支持向量机等（`SVM`)其它机器学习算法。
+4. 作者说应该研究更加高级的语言来处理神经网络的不同属性，而不是使用特定的方法来单独处理一些属性。
+5. 第5点也是我一直“耿耿于怀”的，作者也希望出现能适应更加大规模且精确的检测方法（`Scalable Verification with Tighter Bounds`）。
+6. 测试方法的验证。目前很多测试的方法都像对待传统软件一样是基于覆盖率的，但作者认为显然单个神经元并不等价于传统程序中的一个变量，因为单个神经元可能并不能决定某个`input`的执行路径。因此，对于`DNNs`，需要更加复杂精巧的对于覆盖度的衡量。
+7. 包含`DNN`组件的系统中，能否做到将对于`DNN component`的检测简化成对于整个系统的检测。
+8. 作者认为训练样本的维度太大致使训练数据肯定只能覆盖其中的一部分空间。那么我们显然有理由相信经过训练的模型对于接近训练数据分布的测试样本能够表现良好，但对于远离分布的测试样本就会有较低的置信度。所以可以建立实时的监控系统在实际检测前判断此输入样本的结果是否不值得考虑。
+9. 缺少对于可解释性的一致性定义。虽然现有的研究能够提供有关DNNs的各种局部信息，但很难在系统的框架下对它们进行比较。
+10. 可解释性对于`verifying`, `testing`或者`attacking`等几个方面的帮助。比如说对于输入维度的关键性排序对于找到对抗样本是具有启发意义的。
+11. 最后一点比较迷糊，作者认为现在的检测验证是`DNNs`到用户的单方面的信息增强，而从人如何增强网络的可信化却只有很少的研究。
+
+> All the techniques reviewed are to improve the trust of human users on the DNNs through the angles of certification and explanation. Certification techniques improve the confidence of the users on the correctness of the DNNs, and the explanation techniques increase human users’ understanding about the DNNs and thus improve the trust. These can be seen as a one-way enhancement of confidence from the DNNs to the human users. The other direction, i.e., how human users can help improve the trustworthiness of the DNNs, is less explored. There are only a few works such as [Tamagnini et al., 2017], where a visual analytic interface is presented to enable expert user by interactively exploring a set of instance-level explanations.
+
+## Conclusions
+作者认为这是集`formal verification`, `software testing`, `machine learning`和`logic reasoning`多个领域知识的崭新的研究方向。虽然我还算初学者，但我觉得还应该加上数学。
+并且我觉得如果不能做到实用的级别，那么再多的研究也只是五十步笑百步。所以我有点迷茫，这么多可以着力的小方向到底哪个才是“正途”呢？
+这里分享一个可有可无的观点，是我在github上“厚着脸”向这篇[论文](https://files.sri.inf.ethz.ch/website/papers/DeepPoly.pdf)的作者提的问题。
+
+> Regarding your question, we think that accurate verification can be designed for large scale DNNs by a combination of algorithmic and performance improvements that exploit the structure of the verification problem.
+
+嗯。。。我倒觉得如果它一开始就知道训练完成的模型是具有黑盒特性，与其费尽心思在之后证明它，是不是可以直接推翻原有的训练模式等，直接建立可以验证的`DNN`？当然，说说总是容易的。
