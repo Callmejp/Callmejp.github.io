@@ -33,10 +33,11 @@ tags:
 一般论文的背景阅读可能可有可无，但这篇论文几乎没有废话。
 
 ### Differential Dynamic Logic
-我译为`微分动态逻辑`。作者主要通过一个行驶在直线上的车子的一维模型作为例子给出了其简单的混合程序(`hybrid program`)。
+我译为`微分动态逻辑`。作者主要通过一个行驶在直线上的汽车的一维模型作为例子给出了其简单的混合程序(`hybrid program`)。
 
-    $$
-    Example.1 \\
-    { ( \underbrace{(a := A \bigcup a := 0)}_{ctrl}; \underbrace{( p^{'} := v \bigcup v^{'} := a)}_{plant} ) }^{*}
-    $$
+$$
+Example.1 \\
+{ ( \underbrace{(a := A \bigcup a := 0)}_{ctrl}; \underbrace{( p^{'} := v \bigcup v^{'} := a)}_{plant} ) }^{*}
+$$
 
+例1描述了一辆汽车，它非确定性地选择以最大加速度a加速或不加速，然后遵循一个微分方程。这个过程可能会重复任意多次(由重复操作符表示)。由于植物没有进化域约束，每一个连续进化都有任意的非负持续时间
