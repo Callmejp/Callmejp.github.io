@@ -11,12 +11,9 @@ tags:
 ---
 
 ## 引言
-主要内容来自：[https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/download/17376/16225](https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/download/17376/16225) 
-
-讲的是如何使用形式化方法(`Formal Methods`)来确保`RL`(`Reinforcement Learning`, 即强化学习)训练时的安全性。
-
-起初看到内容中有很多延伸阅读的论文和一些专业名词，以为是比较艰深的一篇paper，不过静下心来后发现难度尚可。
-
+主要内容来自：[https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/download/17376/16225](https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/download/17376/16225)  
+讲的是如何使用形式化方法(`Formal Methods`)来确保`RL`(`Reinforcement Learning`, 即强化学习)训练时的安全性。  
+起初看到内容中有很多延伸阅读的论文和一些专业名词，以为是比较艰深的一篇paper，不过静下心来后发现难度尚可。  
 依旧是按照论文的行文顺序进行一定的解读。
 
 ## Introduction
@@ -53,13 +50,13 @@ $$
 ![img](/img/2019-7-16/image2.JPG)
 
 #### Differential Dynamic Logic.
-每一个混合程序$\alpha$都和操作符$[\alpha]$和$<\alpha>$联系在一起，表达了程序的状态可达性。公式$[\alpha]\phi$表达的是由程序$\alpha$可到达的任何状态，公式$\phi$都是正确的。而$<\alpha>\phi$表达的是在程序$\alpha$执行了几次后，公式$\phi$是正确的。然后一般情况下微分动态逻辑的公式形式如下
-1. ${\theta}_{1} \sim {\theta}_{2}$
+每一个混合程序$\alpha$都和操作符$[\alpha]$和$\langle \alpha \rangle$联系在一起，表达了程序的状态可达性。公式$[\alpha]\phi$表达的是由程序$\alpha$可到达的任何状态，公式$\phi$都是正确的。而$\langle \alpha \rangle \phi$表达的是在程序$\alpha$执行了几次后，公式$\phi$是正确的。然后一般情况下微分动态逻辑的公式形式如下
+1. $ \theta_{1} \sim \theta_{2}$
 2. $\neg \phi \mid \phi \land \psi \mid  \phi \lor \psi \mid \phi \rightarrow \psi$
 3. $\forall x \phi \mid \exists x \phi$
-4. $[\alpha]\phi \mid <\alpha>\phi$
+4. $[\alpha]\phi \mid \langle \alpha \rangle \phi$
 
-其中${\theta}_{i}$是关于实数的数学表达式，$\phi\ and\ \psi$是公式，$\alpha$是程序，$\sim$意味着大于，小于等关系符号。$s \models P$表达在状态$s$下$P$为真。
+其中${\theta}_{i}$是关于实数的数学表达式，$\phi\$和$\psi$是公式，$\alpha$是程序，$\sim$意味着大于，小于等关系符号。$s \models P$表达在状态$s$下$P$为真。
 
 这些都是基础的语法，它有助于我们了解之后实际的建模规则。
 
@@ -68,13 +65,13 @@ Example.2(对于直线行驶汽车模型的安全性描述) \\
 \underbrace{ v \geq 0 \land A > 0}_{initial\ condition} \rightarrow { [( \underbrace{(a := A \cup a := 0)}_{ctrl}; \underbrace{( p^{'} := v \cup v^{'} := a)}_{plant} )] }^{*} \underbrace{ v \geq 0 }_{post\ cond.}
 $$
 
-上述公式表达了如何汽车以非负的速度出发，它仍旧会在一段时间的状态转移后拥有非负的速度。
+上述公式表达了如果汽车以非负的速度出发，它仍旧会在一段时间的状态转移后拥有非负的速度。
 
 ### ModelPlex: Verified Runtime Validation
 主要有两个监控器。
 
 #### Controller Monitors
-控制器监视器是布尔函数，用于监视是否违反了混合系统模型的控制器部分。监视器接受两个输入——“pre”状态和“post”状态。当且仅当程序的`ctrl`片段在“pre”状态下执行时产生“post”状态时，控制器监视器才返回true。例如，模型2的控制监控器为:
+控制器监视器是布尔函数，用于监视是否违反了混合系统模型的控制器部分。监视器接受两个输入——“pre”状态和“post”状态。当且仅当程序的`ctrl`片段在“pre”状态下执行时产生“post”状态时，控制器监视器才返回`true`。例如，模型2的控制监控器为:
 
 $$
 (v_{post} = v \land p_{post} = p \land a_{post} = a) \lor (v_{post} = v \land p_{post} = p \land a_{post} = 0)
@@ -128,13 +125,13 @@ $$
 序列$u, s, L$是`JSCGeneric`算法每一步所选择的控制动作、状态和学习模型(如`Q`表或`NN`)。递归关系等价于在`JSCGeneric`伪代码中执行的计算，除了上一节讨论的活动警告之外。其中活动警告指的是在此处安全的动作可以是空集。
 
 $$
-Corollary 1 (控制监控器的意义). \\
-假设CM是对于\ P \rightarrow [{\{ctrl; plant\}}^{*}]Q\ and\ s \in S\and\ u: S \rightarrow S.\ 的控制监控器\\
-Then CM(u, s)意味着(s, u(s)).
+Corollary\ 1 (控制监控器的意义). \\
+假设CM是对于\ P \rightarrow [{\{ctrl; plant\}}^{*}]Q\ and\ s \in S\ and\ u: S \rightarrow S.\ 的控制监控器\\
+Then\ CM(u, s)意味着(s, u(s)).
 $$
 
 $$
-Corollary 2 (模型监控器的意义). \\
+Corollary\ 2 (模型监控器的意义). \\
 假设MM是对于\ init \rightarrow [{\{ctrl; plant\}}^{*}]Q\ and\ (u, s, L)是一个学习的过程. \\
 如果MM(s_{i-1}, u_{i-1}, s_{i})对于所有的i都有s_{i} \models Q, 且(s_{i}, u_{i}(s_{i})) \in [[ctrl]] 意味着(u_{i}(s_{i}), s_{i+1}) \in [[plant]].
 $$
@@ -142,7 +139,8 @@ $$
 我们现在准备陈述第一个主要的安全属性——如果环境被准确地建模，`JSCGeneric`在增强学习过程中不会违反系统的安全特性。
 
 $$
-Definition 3. 如果对于所有s \in S and u \in A，那么就认为环境E被系统{ctrl; plant}^{*}用动作集合A和状态S准确地建模了。
+Definition\ 3. \\
+如果对于所有s \in S and u \in A，那么就认为环境E被系统{ctrl; plant}^{*}用动作集合A和状态S准确地建模了。 \\
 (s, u(s)) \in [[ctrl]] 意味着(u(s), E(s, u)) \in [[plant]]
 $$
 
