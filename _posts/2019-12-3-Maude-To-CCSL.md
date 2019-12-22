@@ -89,7 +89,7 @@ According to our understanding, we think the `formalization of a clock system` d
 
 For example, as the figure below shows: if there is a constraint $c_1 \triangleq c_2 + c_3$, then condition $c1 \notin F \lor c_2 \in F \lor c_3 \subset F$ can satisfy it.
 
-![Union](/img/2019-12-3/union.jpg)
+![Union](/img/2019-12-3/union.JPG)
 
 But, it's clear that $c_1 \in \chi(n) \Leftrightarrow c_2 \in \chi(n) \land c_3 \in \chi(n)$ express the ` bidirectional relationship`.
 
@@ -105,7 +105,7 @@ There is a `paradox` between the `finite` sequence we can generated and the form
 
 So, as the figure below shows, periodic scheduling can solve the problem to some extent.
 
-![Periodic scheduling](/img/2019-12-3/period.jpg)
+![Periodic scheduling](/img/2019-12-3/period.JPG)
 
 `In short, all clocks have the same cycle.`
 
