@@ -149,9 +149,10 @@ crl [periodic] : < (F, F') ; PHI ; X ; K > => < (F, F') ; PHI ; rollback(X', P) 
 	   P := getPeriod(X', PHI, K, K + 1) .
 ```
 
-By the way, `rollback` is done by ourselves.
+By the way, `rollback` is done by ourselves. 
 
 ```m
+  --- Code Segment in fmod ConFIGURATION
   var X : Conf .
   vars K N1 : Nat .
   var Y : ConfElt .
@@ -170,9 +171,9 @@ By the way, `rollback` is done by ourselves.
 
 ## Generate specific sequences
 
-
+balabala
 
 # Concluding remarks
 
 1. `Maude`: FrameWork for Formal Verification.
-2. 
+2. `CCSL`: Like the `SAT/SMT` problem to some extent.
