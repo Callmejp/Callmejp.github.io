@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "基于Maude验证CCSL约束的可行性"
+title:      "基于Maude验证CCSL的相关性质"
 subtitle:   "论文的复现与拓展"
 date:       2019-12-21
 author:     "JohnReese"
@@ -39,10 +39,12 @@ Github: [https://github.com/Callmejp/CCSL2Maude](https://github.com/Callmejp/CCS
 Some Statistics:
 
 $$
-111 / 233 \thickapprox 50.3\% \\
-fmod: CLOCK , TICK-LIST, MAIN\\
+200(done\ by\ ourselves) / 300 \thickapprox 66\%\\
+Open\ test\ cases\ that\ are\ as\ complete\ as\ possible \\
+Other Function: verify.maude(\thickapprox 100\ similar\ lines\ code)\\
+Details:\\
+mod: CLOCK , TICK-LIST, MAIN\\
 Constraints: Subclock, Supremum, Causality, Exclusion, Union, Intersection \\
-Other Function: verify.maude
 $$
 
 ## Comprehension To CCSL
@@ -97,7 +99,12 @@ So, state $c_1 \notin \chi(n) \land c_2 \in \chi(n) \land c_3 \notin \chi(n)$ ap
 
 As a result, we abstract the constraints based on the original definitions and our understanding.
 
-You can check the `TestCaseForConstraints.md` in the repository.
+```m
+--- Union
+  eq satisfy(([C1, TL1], [C2, TL2], [C3, TL3], F), C3 != C2 + C1, K) =
+    if get(TL3, K) == 1 then (get(TL1, K) == 1 or get(TL2, K) == 1) else (not (get(TL1, K) == 1 or get(TL2, K) == 2)) fi .
+```
+Moreover, you can check all test cases in the `TestCaseForConstraints.md` included in the github repository.
 
 ## Periodic scheduling
 
@@ -110,11 +117,11 @@ So, as the figure below shows, periodic scheduling can solve the problem to some
 `In short, all clocks have the same cycle.`
 
 ```m
-eq isPeriodic(([C1, TL1, N1],[C2, TL2, N2], X), (C1 < C2) PHI, K, K’) = 
-  tick(TL1,K) == tick(TL1,K’) and
-  tick(TL2,K) == tick(TL2,K’) and
+eq isPeriodic(([C1, TL1, N1],[C2, TL2, N2], X), (C1 < C2) PHI, K, K') = 
+  tick(TL1,K) == tick(TL1,K') and
+  tick(TL2,K) == tick(TL2,K') and
   sd(N1,num(TL1,K)) >= sd(N2,num(TL2,K)) and
-  isPeriodic(X,PHI,K,K’) .
+  isPeriodic(X,PHI,K,K') .
 
 ***(
     C*: Clock's name
@@ -125,9 +132,9 @@ eq isPeriodic(([C1, TL1, N1],[C2, TL2, N2], X), (C1 < C2) PHI, K, K’) =
     K': end of the cycle
 )
 ```
-We thick the code above written in the paper has a logical error. As you can see, `isPeriodic(X,PHI,K,K’)` will remove the `C1 & C2` in the `X`. But if there're other constraints that include 'C1 & C2', it will apprently cause errors when running programs.
+We think the code above written in the paper has a logical error. As you can see, `isPeriodic(X,PHI,K,K')` will remove the `C1 & C2` in the `X`. But if there're other constraints that include `C1 & C2`, it will apprently cause errors when running programs.
 
-You can also check our implemention and test in our repository.
+You can also check our implemention and test cases in our repository.
 
 ## Formal verification by (bounded) model checking
 
@@ -171,7 +178,38 @@ By the way, `rollback` is done by ourselves.
 
 ## Generate specific sequences
 
-balabala
+It's clear that there may be many `Schedules` satisfing the `Constraints`. Take a step further, maybe user have their preferences based on requirements. For example, try to generate the `Schedule` that `tick` as little as possible, or as much as possible.
+
+Authors defined these requirements as `Policy`.
+
+Practical implemention are based on the `META-LEVEL` in `Maude`.
+
+Main idea is generating all the schdule and pick the schdule satisfing the `Policy`.
+
+```m
+--- all for getNonTickConf (WDNMD)
+  eq getLastIdle(([C1, TL1, N], X), C1) = lastIsIdle(TL1) .
+  
+  eq existNonTick(empty, C) = false .
+  eq existNonTick((X | CF), C) = if getLastIdle(X, C) then true else existNonTick(CF, C) fi .
+  
+  eq pick(empty, C) = empty .
+  eq pick((X | CF), C) = if getLastIdle(X, C) then X | pick(CF, C) else pick(CF, C) fi .
+
+  eq getNonTickConf(CF, C) = if existNonTick(CF, C) then pick(CF, C) else CF fi .
+
+  --- rules
+  crl [next] : [ < F ; PHI ; X ; K >, P ] => [ < F ; PHI ; X' ; K + 1 >, P ]
+    if X' := getConfByPol(getAllSuccessors(< F ; PHI ; X ; K >, 0), P) .
+
+  ceq getAllSuccessors(< F ; PHI ; X ; K >, N) = downTerm(T, nil) | getAllSuccessors(< F ; PHI ; X ; K >, N + 1) 
+    if RT := metaSearch(upModule('MAIN, false), upTerm(< F ; PHI ; X ; K >), '<_;_;_;_>[upTerm(F), upTerm(PHI), 'X':Conf, upTerm(M + 1)], nil, '+, 1, N) /\ ('X':Conf <- T) := getSubstitution(RT) .
+
+  eq getConfByPol(CF, lazy(empty)) = CF .
+  eq getConfByPol(CF, lazy(C | CS)) = getConfByPol(getNonTickConf(CF, C), lazy(CS)) .
+```
+
+For a variety of reasons, this part is difficult for us. As you can see, just for implementing the function `getNonTickConf`, we write other 3-4 functions.
 
 # Concluding remarks
 
