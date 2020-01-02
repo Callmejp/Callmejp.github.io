@@ -14,7 +14,7 @@ tags:
 
 ## Maude
 1. Rewrite: `op` and `rl`.
-2. Search: `search` and `LTL`.
+2. Search: `search` and `Model-Checker`.
 
 
 ## Clock Constraint Specification Language(CCSL)
@@ -79,7 +79,7 @@ $$
 1. Key Code Segment:
    ```m
    crl [next] : < (F, F') ; PHI ; X ; K > => < (F, F'); PHI ; update(X, F) ; K + 1 >
-     if F =/= empty /\ satisfy(F, X, PHI) /\ .
+     if F =/= empty /\ satisfy(F, X, PHI) .
    
    ***(
      F is the subset of Clocks that will tick at the time step (K + 1) .
@@ -93,16 +93,16 @@ For example, as the figure below shows: if there is a constraint $c_1 \triangleq
 
 ![Union](/img/2019-12-3/union.JPG)
 
-But, it's clear that $c_1 \in \chi(n) \Leftrightarrow c_2 \in \chi(n) \land c_3 \in \chi(n)$ express the ` bidirectional relationship`.
+But, it's clear that $c_1 \in \delta(n) \Leftrightarrow c_2 \in \delta(n) \land c_3 \in \delta(n)$ express the ` bidirectional relationship`.
 
-So, state $c_1 \notin \chi(n) \land c_2 \in \chi(n) \land c_3 \notin \chi(n)$ apparently satisfy the `formalization of a clock system`, but it can't satisfy the original defination of `Union Constraint`.
+So, state $c_1 \notin \delta(n) \land c_2 \in \delta(n) \land c_3 \notin \delta(n)$ apparently satisfy the `formalization of a clock system`, but it can't satisfy the original defination of `Union Constraint`.
 
 As a result, we abstract the constraints based on the original definitions and our understanding.
 
 ```m
---- Union
-  eq satisfy(([C1, TL1], [C2, TL2], [C3, TL3], F), C3 != C2 + C1, K) =
-    if get(TL3, K) == 1 then (get(TL1, K) == 1 or get(TL2, K) == 1) else (not (get(TL1, K) == 1 or get(TL2, K) == 2)) fi .
+  --- Union 
+  eq satisfy(F, ([C1, TL1, N1], [C2, TL2, N2], [C3, TL3, N3], X), C1 != C2 + C3) = 
+    if (C1 in F) then ((C2 in F) or (C3 in F)) else (not ((C2 in F) or (C3 in F))) fi .
 ```
 Moreover, you can check all test cases in the `TestCaseForConstraints.md` included in the github repository.
 
@@ -133,6 +133,14 @@ eq isPeriodic(([C1, TL1, N1],[C2, TL2, N2], X), (C1 < C2) PHI, K, K') =
 )
 ```
 We think the code above written in the paper has a logical error. As you can see, `isPeriodic(X,PHI,K,K')` will remove the `C1 & C2` in the `X`. But if there're other constraints that include `C1 & C2`, it will apprently cause errors when running programs.
+
+```m
+eq isPeriodic(([C1, TL1, N1], [C2, TL2, N2], X), (C1 < C2) PHI, K, K') = 
+    get(TL1, K) == get(TL1, K') and
+    get(TL2, K) == get(TL2, K') and
+    sd(N1, cal(TL1, K)) >= sd(N2, cal(TL2, K)) and
+    isPeriodic(([C1, TL1, N1], [C2, TL2, N2], X), PHI, K, K') .
+```
 
 You can also check our implemention and test cases in our repository.
 
@@ -186,6 +194,8 @@ Practical implemention are based on the `META-LEVEL` in `Maude`.
 
 Main idea is generating all the schdule and pick the schdule satisfing the `Policy`.
 
+**Example:** `Laziness: to specify a set of lazy clocks that only tick if they have to tick at each step.`
+
 ```m
 --- all for getNonTickConf (WDNMD)
   eq getLastIdle(([C1, TL1, N], X), C1) = lastIsIdle(TL1) .
@@ -214,4 +224,4 @@ For a variety of reasons, this part is difficult for us. As you can see, just fo
 # Concluding remarks
 
 1. `Maude`: FrameWork for Formal Verification.
-2. `CCSL`: Like the `SAT/SMT` problem to some extent.
+2. `CCSL`: Like the `SAT` problem to some extent.
