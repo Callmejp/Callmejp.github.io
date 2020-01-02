@@ -4,7 +4,7 @@ title:      "Some naive thoughts on reinforcement learning"
 subtitle:   "Mainly about Reward"
 date:       2019-12-27
 author:     "JohnReese"
-header-img: "img/2019-12-3/river.jpg"
+header-img: "img/2019-12-27/river.jpg"
 mathjax: True
 tags:
     - RL
@@ -38,7 +38,7 @@ Then, choosing actions other than a with a probability of $\epsilon$.
 
 2. Actual Performence with different $\epsilon$
 
-![result](/img/2019-12-27/Result.JPG)
+![result](/img/2019-12-27/result.JPG)
 
 ## Background(Nature)
 
