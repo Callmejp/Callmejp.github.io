@@ -225,3 +225,8 @@ For a variety of reasons, this part is difficult for us. As you can see, just fo
 
 1. `Maude`: FrameWork for Formal Verification.
 2. `CCSL`: Like the `SAT` problem to some extent.
+
+   $$
+   Union \Rightarrow (c_1 \rightarrow c_2 \lor c_3) \land (c_2 \lor c_3 \rightarrow c_1)\\
+   \Rightarrow (\lnot c_1 \lor c_2 \lor c_3) \land (\lnot(c_2 \lor c_3) \lor c_1)
+   $$
