@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Introduction To Latex的基础实用操作"
+title:      "Introduction To Latex"
 subtitle:   "Latex的基础实用操作"
 date:       2020-01-08
 author:     "JohnReese"
@@ -80,7 +80,7 @@ Your Abstract
      ```
      效果如下:
 
-     ![equation](../img/2020-1-8/equation.JPG)
+     ![equation](/img/2020-1-8/equation.JPG)
 
      * 有些公式字符还需要导入`\usepackage{amsmath}`包。
 4. `\textsl{}`是倾斜，`\textbf{}`是加粗。
