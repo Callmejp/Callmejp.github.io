@@ -4,5 +4,4 @@ node_modules
 */.DS_Store
 */*/.DS_Store
 *.sh
-_posts/*trace*.md
-_posts/temp*
+temporary/*

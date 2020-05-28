@@ -36,3 +36,10 @@ tags:
    * [编译和反编译](https://www.hollischuang.com/archives/2322)
    * [反编译工具](https://blog.csdn.net/u011479200/article/details/80019827)
    * [逃逸分析](https://www.hollischuang.com/archives/2583)
+
+3. Javascript
+   * [AST抽象语法树](https://segmentfault.com/a/1190000016231512?utm_source=tag-newest)
+   * [简易JS编译器](https://the-super-tiny-compiler.glitch.me/tokenizer)
+  
+4. Git
+   * [Git只下载其中的部分文件](https://www.itsvse.com/thread-7086-1-1.html)
