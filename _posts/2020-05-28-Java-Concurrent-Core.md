@@ -59,7 +59,7 @@ final void lock() {
 }
 ```
 
-前面已经提到，`AQS`已经实现了`acquire`方法，它会调用`tryAcquire`方法，但`ReentrantLock`对于`tryAcquire`的具体实现并没有特殊之处，就是再次尝试修改同步状态，因此如果修改状态失败就会紧接着调用`AQS`中的`addWaiter`和`acquireQueued`方法，简单点来说就会令当前线程进入等待并将其信息保存在之前提到的链表中。
+前面已经提到，`AQS`已经实现了`acquire`方法，它会调用`tryAcquire`方法，但`ReentrantLock`对于`tryAcquire`的具体实现并没有特殊之处，就是再次尝试修改同步状态，因此如果修改状态失败就会紧接着调用`AQS`中的`addWaiter`和`acquireQueued`方法，简单来说就会令当前线程进入等待并将其信息保存在之前提到的链表中。
 
 有`lock`就有对应的`unlock`方法。同样，`ReentrantLock`也会直接交给`sync`去处理。其中`tryRelease`（见如下代码）在执行前会首先判断当前的执行线程是不是当前记录的占有锁的线程。如果当前同步状态减去本次所释放的资源后为0就表示当前已没有线程占有锁了，因此依次修改相关的记录信息。注意，`ReentrantLock`虽然本身只代表“一把锁”，但因为其是可重入的，也就是已经持有锁的线程可以再次调用`lock`方法，所以同步状态可能会大于1，并不是只有1和0两种状态。
 
@@ -116,25 +116,25 @@ public final void await() throws InterruptedException {
 
 ## CAS
 
-加锁始终是一个相对较重的操作，能不能做到`lock-free`而不影响线程并发时程序执行的正确性？答案是肯定的，`CAS`就是相应的手段。
+加锁始终是一个相对较重的操作，能不能做到`lock-free`而不影响程序并发时执行的正确性？答案是肯定的，`CAS`就是相应的手段。
 
 `CAS`通常需要3个操作数：内存地址V，旧的预期值A，即将要更新的目标值B。`CAS`指令执行时，当且仅当内存地址V所对应的值与预期值A相等时，则将内存地址V的值修改为B，否则就什么都不做。整个比较并替换的操作是一个原子操作。
 
 可以预见的是，`CAS`并不能保证一次成功，所以一般会以类似“自旋”的方式尝试多次。因此，进一步可以预见的，在竞争激烈的场景下，可能`CAS`的表现并不好，而且会消耗大量的CPU资源。`Brian Goetz`在《Java并发编程实战》就做了相应的实验，可以看到在比较极端的场景下，使用`CAS`的性能表现还稍弱后于基于锁的`ReentrantLock`。但是，在竞争适度的情况下`CAS`就领先很多了。
 
-![对比1](/img/2020/5-31/1.JPG)
+![对比1](/img/2020-5-31/1.JPG)
 
-![对比2](/img/2020/5-31/2.JPG)
+![对比2](/img/2020-5-31/2.JPG)
 
 但是世上难有完美的事物——1.虽然大多数情况下，开发者可以直接使用Java提供的类库，所以一般来说`CAS`对于开发者是透明的。但我们应该认识到相对于使用锁，它提高了编码的复杂性；2.使用`CAS`往往意味着需要牺牲部分的数据一致性。
 
 我就以`ConcurrentLinkedQueue`作为例子来解释上述的两个观点。不过在阅读源代码之前，我们必须对于`Michael-Scott`提出的此队列算法有一个大概了解：
-1. 因为是通过链表实现队列，所以肯定需要记录头节点和尾节点
+1. 因为是通过链表实现队列，所以肯定需要记录头节点（head）和尾节点（tail）
 2. 因为不加锁的原因，头节点和尾节点并不能保证时时指向第一个节点和最后一个节点
-3. 所以插入元素大致分为2个部分：找到尾节点；通过`CAS`(null, newNode)插入新结点。（尾节点的nextNode一定是null）
-4. 如第2点所说，即使在第3点中找到了尾节点，在调用`CAS`的时候，尾节点也可能会产生变化。但是不怕，多尝试几次即可，只要保证`CAS`这一步的原子性，就能保证整体的正确性
+3. 所以插入元素大致分为2个部分：找到尾节点；通过`CAS(null, newNode)`插入新结点。（尾节点的nextNode一定是null）
+4. 如第2点所说，即使在第3点中找到了尾节点，在调用`CAS`的时候，尾节点也可能会产生变化。但是不怕，多尝试几次即可。只要保证`CAS`这一步的原子性，就能保证整体的正确性
 
-比如当我们调用`offer`方法向队列尾部添加元素时，源代码如下：
+`offer`方法(向队列尾部添加元素)的源代码如下，因为相对比较复杂，所以直接将解读对应在源码中：
 
 ```java
 // ConcurrentLinkedQueue.java
@@ -142,21 +142,43 @@ public final void await() throws InterruptedException {
 public boolean offer(E e) {
     checkNotNull(e);
     final Node<E> newNode = new Node<E>(e);
-
+    // 外层是“死循环”CAS，直到入队成功
     for (Node<E> t = tail, p = t;;) {
         Node<E> q = p.next;
+        /* 判断p是不是尾节点。
+        其中判断是不是尾节点的依据是该节点的next是不是null */
         if (q == null) {
-            // p is last node
+            /* 设置p节点的下一个节点为新节点，设置成功则casNext返回true；
+            否则返回false，说明有其他线程更新过尾节点，就重新来过 */
             if (p.casNext(null, newNode)) {
+                /* 如果p != t，则将入队节点设置成tail节点，更新失败了也没关系
+                因为失败了表示有其他线程成功更新了tail节点*/
                 if (p != t) 
                     casTail(t, newNode); 
                 return true;
             }
         }
         else if (p == q)
+        /* 这里较为复杂，我就摘录网上的资料：
+        如果next为自身，表示是哨兵节点
+        则从head重新向后遍历（因为掉队了） 
+        */
             p = (t != (t = tail)) ? t : head;
         else
+        /* 其他情况，则继续向后查找尾节点 */
            p = (p != t && t != (t = tail)) ? t : q;
     }
 }
 ```
+
+至于牺牲的部分数据一致性可以从其`size`方法的文档中看出：
+
+> Beware that, unlike in most collections, this method is NOT a constant-time operation. Because of the asynchronous nature of these queues, determining the current number of elements requires an O(n) traversal. Additionally, if elements are added or removed during execution
+of this method, the returned result may be inaccurate. Thus, this method is typically not very useful in concurrent applications.
+
+你可以看出，因为不会保存`size`变量，所以此方法每次都需要`O(n)`的时间复杂度来遍历得到结果。而且这个方法因为不存在`fail fast`机制，所以大概率是不准确的。
+
+**因此，需求才是第一位的。当你需要经常调用`size`的时候，可能换个数据结构才是更好的选择。**
+
+最后，再提一个`ABA`问题：
+> 这是通常只在 `lock-free`算法下暴露的问题。我前面说过 `CAS`是在更新时比较前值，如果对方只是恰好相同，例如期间发生了`A -> B -> A`的更新，仅仅判断数值是A，可能导致不合理的修改操作。针对这种情况，Java 提供了 `AtomicStampedReference`工具类，通过为引用建立类似版本号（stamp）的方式，来保证 CAS 的正确性。 —— 《Java核心技术面试精讲》
