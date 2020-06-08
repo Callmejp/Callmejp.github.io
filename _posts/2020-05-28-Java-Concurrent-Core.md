@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Java并发源码中的“巅峰”"
-subtitle:   "AbstractQueuedSynchronizer,"
+subtitle:   "AbstractQueuedSynchronizer, CAS"
 date:       2020-05-28
 author:     "JohnReese"
 header-img: "img/2020-2-11/stone.jpg"
@@ -10,7 +10,7 @@ tags:
     - Java
 ---
 
-阅读这篇文章，你可能需要先了解`Re`包中常见的用于实现线程同步的类的常规用法。本文的目的是基于源码，尝试对比较重要的并发类的实现方式给出通俗的解读。
+本文的目的是基于源码，尝试对比较重要的并发类的实现方式给出通俗的解读。
 
 一方面是因为源码的细节很多，给出源码而不能完全解释其中的每个点就没啥意思了；另一方面也是自身的水平不足。所以只给出易于理解的主体实现方式。
 
