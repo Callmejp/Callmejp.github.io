@@ -32,7 +32,6 @@ tags:
 1. 特征函数：We define a feature to be a function mapping from the input space $X$ to real numbers, with the
 set of all features thus being $F = \{f : X \rightarrow R\}$.
 2. 在`1`的基础上定义 $\rho -useful$ features: For a given distribution $D$, we call a feature $\rho -useful (ρ > 0)$ if it is correlated with the true label in expectation, that is if
-   
   $$
   E_{(x, y) \sim D}[y \cdot f(x)] \ge \rho.
   $$
@@ -42,6 +41,7 @@ set of all features thus being $F = \{f : X \rightarrow R\}$.
   E_{(x, y) \sim D}[\mathop{}_{\delta \in \triangle(x)}^{inf} y \cdot f(x + \delta)] \ge \gamma.
   $$
   * 非鲁棒特征： A useful, non-robust feature is a feature which is $\rho -useful$ for some $\rho$ bounded away from zero, but is not a $\gamma-robust$ feature for any $\gamma \ge 0$.
+
 3. 为了便于实现，分类器比较简单：A classifier $C = (F, w, b$) is comprised of a set of features
 $F$, a weight vector $w$, and a scalar bias $b$:
     $$
@@ -54,9 +54,9 @@ $F$, a weight vector $w$, and a scalar bias $b$:
 3. 非鲁棒数据集，标准训练方式
 4. 非鲁棒数据集，对抗训练方式
 
-其中鲁棒数据集指的是由基本只含有鲁棒特征的图片组成的，即下图的$\hat{D}_{R}$。而非鲁棒数据集基本就是人类无法依据此图片辨识出标签的，即下图的$\hat{D}_{NR}$
+其中鲁棒数据集指的是由基本只含有鲁棒特征的图片组成的，即下图的${\hat{D}}_{R}$。而非鲁棒数据集基本就是人类无法依据此图片辨识出标签的，即下图的${\hat{D}}_{NR}$。
 
-那么只剩下一个问题，如何抽出鲁棒特征与非鲁棒特征从而形成两个数据集。[这篇解读](https://baijiahao.baidu.com/s?id=1633163994368960188&wfr=spider&for=pc)加上自己理解总结如下：两个数据集都是由同一个原数据集产生的。为了总结出鲁棒特征，作者首先准备了一个鲁棒的模型，然后以类似`GAN`的方式让准备生成的鲁棒图片和原图片在此模型的倒数第二层的输出尽可能相近（因为最后一层是线性的，也就是分类器根据第二层的`特征`加权得到结果）。我感觉这里不理解也没啥关系，因为你可以通过如下的训练结果直观地感受到作者的想法。
+那么只剩下一个问题，如何抽出鲁棒特征与非鲁棒特征从而形成两个数据集。[这篇解读](https://baijiahao.baidu.com/s?id=1633163994368960188&wfr=spider&for=pc)加上自己理解总结如下：两个数据集都是由同一个原数据集产生的。为了总结出鲁棒特征，作者首先准备了一个鲁棒的模型，然后以类似`GAN`的方式让准备生成的鲁棒图片和原图片在此模型的倒数第二层的输出尽可能相近（因为最后一层是线性的，也就是分类器根据d倒数第二层的`特征`加权得到结果）。我感觉这里不理解也没啥关系，因为你可以通过如下的训练结果直观地感受到作者的想法。
 
 ![四类训练结果](/img/2020-6-8/result.jpg)
 
@@ -170,7 +170,7 @@ $$
 
 ***
 
-以上就是本文的大致内容。进一步的探讨就不展开了，上以上的内容基本能够指明关于对抗样本的研究趋势了。
+以上就是本文的大致内容，进一步的探讨就不展开了。
 
 1. Ilyas A, Santurkar S, Tsipras D, et al. Adversarial examples are not bugs, they are features[C]//Advances in Neural Information Processing Systems. 2019: 125-136.
 2. Szegedy C, Zaremba W, Sutskever I, et al. Intriguing properties of neural networks[J]. arXiv preprint arXiv:1312.6199, 2013.
