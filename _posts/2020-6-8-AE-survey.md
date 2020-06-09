@@ -29,32 +29,32 @@ tags:
 如上，是作者对于对抗性质的一个总结——问题的根源是数据集。虽然我们不停念叨`Big Data`，但数据集到底需要多大才能避免`DNN`习得易于泛化，但其实不鲁棒的性质的问题目前应该是没有一个标准答案的。
 
 接着来看看作者设计了怎样的实验来论证自己的观点吧：
+
 1. 特征函数：We define a feature to be a function mapping from the input space $X$ to real numbers, with the
 set of all features thus being $F = \{f : X \rightarrow R\}$.
-2. 在`1`的基础上定义 $\rho -useful$ features: For a given distribution $D$, we call a feature $\rho -useful (ρ > 0)$ if it is correlated with the true label in expectation, that is if
+2. 在`1`的基础上定义 $\rho -useful$ features: For a given distribution $D$, we call a feature $\rho -useful (ρ > 0)$ if it is correlated with the true label in expectation, that is if：
   $$
   E_{(x, y) \sim D}[y \cdot f(x)] \ge \rho.
   $$
-  
-  * 鲁棒特征：
+3. 鲁棒特征：
   $$
   E_{(x, y) \sim D}[\mathop{}_{\delta \in \triangle(x)}^{inf} y \cdot f(x + \delta)] \ge \gamma.
   $$
-  * 非鲁棒特征： A useful, non-robust feature is a feature which is $\rho -useful$ for some $\rho$ bounded away from zero, but is not a $\gamma-robust$ feature for any $\gamma \ge 0$.
+4. 非鲁棒特征： A useful, non-robust feature is a feature which is $\rho -useful$ for some $\rho$ bounded away from zero, but is not a $\gamma-robust$ feature for any $\gamma \ge 0$.
 
-3. 为了便于实现，分类器比较简单：A classifier $C = (F, w, b$) is comprised of a set of features
-$F$, a weight vector $w$, and a scalar bias $b$:
+5. 为了便于实现，分类器比较简单：A classifier $C = (F, w, b$) is comprised of a set of features $F$, a weight vector $w$, and a scalar bias $b$:
     $$
     C(x) = sgn(b + \mathop{}_{f \in F}^{\sum} w_f \cdot f(x)).
     $$
 
 至此，为了证明鲁棒性特征与非鲁棒性特征的存在，作者设计了四类不同的训练方式：
+
 1. 鲁棒数据集，标准训练方式
 2. 鲁棒数据集，对抗训练方式
 3. 非鲁棒数据集，标准训练方式
 4. 非鲁棒数据集，对抗训练方式
 
-其中鲁棒数据集指的是由基本只含有鲁棒特征的图片组成的，即下图的${\hat{D}}_{R}$。而非鲁棒数据集基本就是人类无法依据此图片辨识出标签的，即下图的${\hat{D}}_{NR}$。
+其中鲁棒数据集指的是由基本只含有鲁棒特征的图片组成的，即下图的$\hat{D}_{R}$。而非鲁棒数据集基本就是人类无法依据此图片辨识出标签的，即下图的$\hat{D}_{NR}$。
 
 那么只剩下一个问题，如何抽出鲁棒特征与非鲁棒特征从而形成两个数据集。[这篇解读](https://baijiahao.baidu.com/s?id=1633163994368960188&wfr=spider&for=pc)加上自己理解总结如下：两个数据集都是由同一个原数据集产生的。为了总结出鲁棒特征，作者首先准备了一个鲁棒的模型，然后以类似`GAN`的方式让准备生成的鲁棒图片和原图片在此模型的倒数第二层的输出尽可能相近（因为最后一层是线性的，也就是分类器根据d倒数第二层的`特征`加权得到结果）。我感觉这里不理解也没啥关系，因为你可以通过如下的训练结果直观地感受到作者的想法。
 
